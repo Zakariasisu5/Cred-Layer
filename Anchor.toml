@@ -1,0 +1,28 @@
+[toolchain]
+anchor_version = "0.30.1"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+credlayer = "CREDqKG3fc8RfScG8uEZP1WoqANgWNJ7o3KG9nfXdUs"
+
+[programs.devnet]
+credlayer = "CREDqKG3fc8RfScG8uEZP1WoqANgWNJ7o3KG9nfXdUs"
+
+[programs.mainnet]
+credlayer = "CREDqKG3fc8RfScG8uEZP1WoqANgWNJ7o3KG9nfXdUs"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[test]
+startup_wait = 10000

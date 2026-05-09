@@ -31,3 +31,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Rust / Anchor
+target/
+**/*.rs.bk
+Cargo.lock
+.anchor/
+test-ledger/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Solana
+.config/
+deploy/
+*.so
