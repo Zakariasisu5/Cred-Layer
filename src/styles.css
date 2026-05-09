@@ -1,0 +1,140 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-gold: var(--gold);
+  --color-elevated: var(--elevated);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Dark by default - institutional Web3 */
+  --background: oklch(0.16 0.02 260);
+  --foreground: oklch(0.97 0.01 250);
+  --elevated: oklch(0.21 0.025 260);
+  --card: oklch(0.205 0.025 260);
+  --card-foreground: oklch(0.97 0.01 250);
+  --popover: oklch(0.21 0.025 260);
+  --popover-foreground: oklch(0.97 0.01 250);
+  --primary: oklch(0.86 0.17 92);
+  --primary-foreground: oklch(0.18 0.02 260);
+  --secondary: oklch(0.27 0.03 260);
+  --secondary-foreground: oklch(0.97 0.01 250);
+  --muted: oklch(0.24 0.025 260);
+  --muted-foreground: oklch(0.66 0.02 255);
+  --accent: oklch(0.3 0.04 255);
+  --accent-foreground: oklch(0.97 0.01 250);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 250);
+  --border: oklch(0.28 0.02 260);
+  --input: oklch(0.25 0.02 260);
+  --ring: oklch(0.86 0.17 92);
+  --success: oklch(0.74 0.18 150);
+  --warning: oklch(0.82 0.16 85);
+  --danger: oklch(0.65 0.23 25);
+  --gold: oklch(0.82 0.16 85);
+  --chart-1: oklch(0.86 0.17 92);
+  --chart-2: oklch(0.86 0.17 92);
+  --chart-3: oklch(0.86 0.17 92);
+  --chart-4: oklch(0.86 0.17 92);
+  --chart-5: oklch(0.86 0.17 92);
+  --sidebar: oklch(0.18 0.02 260);
+  --sidebar-foreground: oklch(0.85 0.01 250);
+  --sidebar-primary: oklch(0.86 0.17 92);
+  --sidebar-primary-foreground: oklch(0.18 0.02 260);
+  --sidebar-accent: oklch(0.24 0.03 260);
+  --sidebar-accent-foreground: oklch(0.97 0.01 250);
+  --sidebar-border: oklch(0.26 0.02 260);
+  --sidebar-ring: oklch(0.86 0.17 92);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.88 0.17 95), oklch(0.78 0.18 75));
+  --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.86 0.17 92 / 0.2), transparent 60%);
+  --shadow-glow: 0 0 40px -10px oklch(0.86 0.17 92 / 0.5);
+  --shadow-card: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0 0 0 / 0.5);
+}
+
+.dark {
+  --background: oklch(0.16 0.02 260);
+  --foreground: oklch(0.97 0.01 250);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body { background-color: var(--color-background); color: var(--color-foreground); }
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, oklch(0.86 0.17 92 / 0.10), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, oklch(0.78 0.18 75 / 0.06), transparent);
+    background-attachment: fixed;
+  }
+}
+
+@utility btn-primary {
+  background: var(--gradient-primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 6px 20px -8px oklch(0.86 0.17 92 / 0.55);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+@utility btn-primary-hover {
+  &:hover { filter: brightness(1.06); box-shadow: 0 10px 28px -8px oklch(0.86 0.17 92 / 0.7); }
+  &:active { transform: translateY(1px) scale(0.99); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; filter: grayscale(0.3); }
+}
+
+@utility text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glow-card {
+  background: linear-gradient(180deg, oklch(0.22 0.025 260 / 0.8), oklch(0.19 0.025 260 / 0.8));
+  border: 1px solid oklch(0.3 0.025 260);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(8px);
+}
