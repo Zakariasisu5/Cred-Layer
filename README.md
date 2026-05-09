@@ -90,8 +90,11 @@ Build trust into your protocol:
 │                  └─────────┬─────────┘                       │
 │                            │                                 │
 │                  ┌─────────▼─────────┐                       │
-│                  │   Solana RPC      │                       │
-│                  │   (Future: Live)  │                       │
+│                  │ Solana Smart      │                       │
+│                  │ Contract (Rust)   │                       │
+│                  │ • On-chain Storage│                       │
+│                  │ • PDA Accounts    │                       │
+│                  │ • Trust Scores    │                       │
 │                  └───────────────────┘                       │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -108,12 +111,17 @@ Build trust into your protocol:
 **Backend:**
 - 🌐 TanStack Start (SSR + API routes)
 - 🤖 Vercel AI SDK for LLM integration
+- 🦀 **Rust + Anchor for Solana smart contracts**
+- 🔗 **Solana Web3.js for blockchain integration**
 - 🔐 Supabase for authentication (future)
 - ☁️ Deployed on Vercel/Cloudflare
 
 **Blockchain:**
-- ⚡ Solana Mainnet
-- 🔗 Web3.js (future integration)
+- ⚡ Solana Mainnet/Devnet
+- 🦀 **Rust smart contract with Anchor framework**
+- 🔐 **PDA-based reputation accounts**
+- 💾 **On-chain trust score storage**
+- 🔗 Web3.js integration
 - 💳 Wallet connection via standard adapters
 
 ---
@@ -125,8 +133,9 @@ Build trust into your protocol:
 - Node.js 18+ or Bun
 - npm or yarn
 - A Solana wallet (Phantom, Solflare, or Backpack)
+- **Rust and Solana CLI (for smart contract development)**
 
-### Installation
+### Frontend Installation
 
 ```bash
 # Clone the repository
@@ -149,6 +158,31 @@ npm run dev
 ```
 
 Visit `http://localhost:3000` and connect your wallet!
+
+### Smart Contract Setup
+
+```bash
+# Run the automated setup script
+chmod +x scripts/setup.sh
+./scripts/setup.sh
+
+# Or follow the manual setup in SOLANA_SETUP.md
+```
+
+### Build Smart Contract
+
+```bash
+# Build the Solana program
+npm run anchor:build
+
+# Run tests
+npm run anchor:test
+
+# Deploy to devnet
+npm run solana:deploy:devnet
+```
+
+For detailed smart contract setup, see [SOLANA_SETUP.md](./SOLANA_SETUP.md)
 
 ### Build for Production
 
@@ -247,13 +281,18 @@ Trust Score = Σ(Positive Signals × Weights) - Σ(Risk Penalties × 0.45)
 - [x] Personal dashboard
 - [x] Leaderboard
 - [x] Developer API structure
+- [x] **Solana smart contract (Rust + Anchor)**
+- [x] **On-chain reputation storage**
+- [x] **PDA-based account system**
 
 ### 🚧 Phase 2: Live Integration (Next)
+- [ ] Deploy smart contract to devnet
 - [ ] Real Solana RPC integration
 - [ ] Live transaction monitoring
 - [ ] Historical data analysis
 - [ ] Supabase authentication
 - [ ] User profiles and history
+- [ ] Backend integration with on-chain data
 
 ### 🔮 Phase 3: Advanced Features
 - [ ] Machine learning reputation model
@@ -278,6 +317,8 @@ Trust Score = Σ(Positive Signals × Weights) - Σ(Risk Penalties × 0.45)
 - 🤖 **x402 micropayments** — Built for autonomous agents
 - 🔍 **Real-time analysis** — Instant reputation for any wallet
 - 🎯 **Multi-dimensional scoring** — Beyond simple metrics
+- 🦀 **On-chain storage** — Decentralized reputation on Solana
+- 🔐 **PDA security** — Secure, verifiable reputation accounts
 
 ### Technical Excellence
 - ⚡ **Modern stack** — React 19, TanStack Start, TypeScript
@@ -318,7 +359,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔗 Links
 
 - 🌐 **Live Demo**: [credlayer.vercel.app](https://credlayer.vercel.app)
-- 📚 **Documentation**: Coming soon
+- 📚 **Smart Contract Setup**: [SOLANA_SETUP.md](./SOLANA_SETUP.md)
+- 🔌 **Backend Integration**: [BACKEND_INTEGRATION.md](./BACKEND_INTEGRATION.md)
+- 🚀 **Deployment Guide**: [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md)
 - 🐦 **Twitter**: [@CredLayer](https://twitter.com/credlayer)
 - 💬 **Discord**: [Join our community](https://discord.gg/credlayer)
 
