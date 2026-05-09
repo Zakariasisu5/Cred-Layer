@@ -1,15 +1,12 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
+// You can pass additional config via defineConfig({ vite: { ... } }) if needed.
+import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Configuration for deployment
+// For Cloudflare: use server entry with @cloudflare/vite-plugin
+// For Vercel: use default node adapter
 export default defineConfig({
-  plugins: [
-    TanStackRouterVite(),
-    react(),
-    tsconfigPaths(),
-  ],
-  ssr: {
-    noExternal: ["@tanstack/react-start"],
+  tanstackStart: {
+    // Comment out for Vercel deployment, uncomment for Cloudflare
+    // server: { entry: "server" },
   },
 });
