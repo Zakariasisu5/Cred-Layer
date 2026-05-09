@@ -13,9 +13,12 @@
     "anchor:build": "anchor build",
     "anchor:test": "anchor test",
     "anchor:deploy": "anchor deploy",
-    "solana:setup": "bash scripts/setup.sh",
-    "solana:deploy:devnet": "bash scripts/deploy.sh devnet",
-    "solana:deploy:mainnet": "bash scripts/deploy.sh mainnet"
+    "solana:setup": "powershell -ExecutionPolicy Bypass -File scripts/setup.ps1",
+    "solana:setup:bash": "bash scripts/setup.sh",
+    "solana:deploy:devnet": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 devnet",
+    "solana:deploy:mainnet": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 mainnet",
+    "solana:deploy:devnet:bash": "bash scripts/deploy.sh devnet",
+    "solana:deploy:mainnet:bash": "bash scripts/deploy.sh mainnet"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.47",
