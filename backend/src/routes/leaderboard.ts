@@ -1,17 +1,26 @@
 import { Router, Request, Response } from 'express';
+import { getLeaderboard } from '../services/reputationStorage';
 
 const router = Router();
 
-// GET /api/leaderboard
-// Placeholder — Waiting real data
 router.get('/', async (req: Request, res: Response) => {
-  return res.json({
-    leaderboard: [
-      // Fake data
-      { rank: 1, wallet: 'Coming soon...', score: null, riskLabel: null },
-    ],
-    message: 'Leaderboard will be populated after Supabase integration',
-  });
+  try {
+    const leaderboard = await getLeaderboard();
+
+    return res.json({
+      leaderboard: leaderboard.map((entry, index) => ({
+        rank: index + 1,
+        wallet: entry.wallet_address,
+        score: entry.score,
+        riskLabel: entry.risk_label,
+        lastUpdated: entry.updated_at,
+      })),
+      total: leaderboard.length,
+    });
+
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;
