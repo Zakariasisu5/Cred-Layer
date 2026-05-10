@@ -16,7 +16,6 @@ import { Route as DeveloperRouteImport } from './routes/developer'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AnalyzerRouteImport } from './routes/analyzer'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiReputationRouteImport } from './routes/api/reputation'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -53,11 +52,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiReputationRoute = ApiReputationRouteImport.update({
-  id: '/api/reputation',
-  path: '/api/reputation',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,7 +61,6 @@ export interface FileRoutesByFullPath {
   '/intelligence': typeof IntelligenceRoute
   '/leaderboard': typeof LeaderboardRoute
   '/settings': typeof SettingsRoute
-  '/api/reputation': typeof ApiReputationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +70,6 @@ export interface FileRoutesByTo {
   '/intelligence': typeof IntelligenceRoute
   '/leaderboard': typeof LeaderboardRoute
   '/settings': typeof SettingsRoute
-  '/api/reputation': typeof ApiReputationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +80,6 @@ export interface FileRoutesById {
   '/intelligence': typeof IntelligenceRoute
   '/leaderboard': typeof LeaderboardRoute
   '/settings': typeof SettingsRoute
-  '/api/reputation': typeof ApiReputationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +91,6 @@ export interface FileRouteTypes {
     | '/intelligence'
     | '/leaderboard'
     | '/settings'
-    | '/api/reputation'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,7 +100,6 @@ export interface FileRouteTypes {
     | '/intelligence'
     | '/leaderboard'
     | '/settings'
-    | '/api/reputation'
   id:
     | '__root__'
     | '/'
@@ -120,7 +109,6 @@ export interface FileRouteTypes {
     | '/intelligence'
     | '/leaderboard'
     | '/settings'
-    | '/api/reputation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,7 +119,6 @@ export interface RootRouteChildren {
   IntelligenceRoute: typeof IntelligenceRoute
   LeaderboardRoute: typeof LeaderboardRoute
   SettingsRoute: typeof SettingsRoute
-  ApiReputationRoute: typeof ApiReputationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,13 +172,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/reputation': {
-      id: '/api/reputation'
-      path: '/api/reputation'
-      fullPath: '/api/reputation'
-      preLoaderRoute: typeof ApiReputationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -203,18 +183,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntelligenceRoute: IntelligenceRoute,
   LeaderboardRoute: LeaderboardRoute,
   SettingsRoute: SettingsRoute,
-  ApiReputationRoute: ApiReputationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
