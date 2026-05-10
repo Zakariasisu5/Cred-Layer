@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   ShieldCheck,
   Activity,
@@ -47,8 +47,15 @@ function Landing() {
   const { connected } = useWallet();
   const navigate = useNavigate();
 
+  // Track whether the wallet was already connected when the page loaded.
+  // Only redirect if the user connects explicitly while on this page,
+  // not on auto-reconnect from a previous session.
+  const wasConnectedOnMount = useRef(connected);
+
   useEffect(() => {
-    if (connected) navigate({ to: "/dashboard" });
+    if (connected && !wasConnectedOnMount.current) {
+      navigate({ to: "/dashboard" });
+    }
   }, [connected, navigate]);
 
   return (
