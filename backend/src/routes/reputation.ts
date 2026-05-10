@@ -1,18 +1,18 @@
 import { Router, Request, Response } from "express";
 import { fetchWalletSignals } from "../blockchain/solanaFetcher";
-import { calculateScore } from '../services/scoringService';
-import { generateExplanation } from '../ai/groqExplainer';
-import { upsertReputation, getWalletHistory } from '../services/reputationStorage';
+import { calculateScore } from "../services/scoringService";
+import { generateExplanation } from "../ai/groqExplainer";
+import { upsertReputation, getWalletHistory } from "../services/reputationStorage";
 
 const router = Router();
 
 // Route: GET /reputation/:wallet
-router.get('/:wallet', async (req: Request, res: Response) => {
+router.get("/:wallet", async (req: Request, res: Response) => {
   const walletParam = req.params.wallet;
   const wallet = Array.isArray(walletParam) ? walletParam[0] : walletParam;
 
   if (!wallet || wallet.length < 32 || wallet.length > 44) {
-    return res.status(400).json({ error: 'Invalid Solana wallet address' });
+    return res.status(400).json({ error: "Invalid Solana wallet address" });
   }
 
   try {
@@ -29,21 +29,21 @@ router.get('/:wallet', async (req: Request, res: Response) => {
       explanation,
       signals,
     });
-
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return res.status(500).json({
-      error: 'Failed to fetch wallet data',
-      details: error.message,
+      error: "Failed to fetch wallet data",
+      details: message,
     });
   }
 });
 
 // POST /api/reputation/update — recalcul forcé
-router.post('/update', async (req: Request, res: Response) => {
+router.post("/update", async (req: Request, res: Response) => {
   const { wallet } = req.body;
 
   if (!wallet) {
-    return res.status(400).json({ error: 'wallet address required in body' });
+    return res.status(400).json({ error: "wallet address required in body" });
   }
 
   try {
@@ -53,7 +53,7 @@ router.post('/update', async (req: Request, res: Response) => {
     const stored = await upsertReputation(wallet, scoreResult, signals, explanation);
 
     return res.json({
-      message: 'Reputation recalculated successfully',
+      message: "Reputation recalculated successfully",
       wallet,
       score: scoreResult.score,
       risk: scoreResult.risk,
@@ -61,22 +61,23 @@ router.post('/update', async (req: Request, res: Response) => {
       explanation,
       updatedAt: stored.updated_at,
     });
-
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ error: message });
   }
 });
 
 // GET /api/reputation/history/:wallet
-router.get('/history/:wallet', async (req: Request, res: Response) => {
+router.get("/history/:wallet", async (req: Request, res: Response) => {
   const walletParam = req.params.wallet;
   const wallet = Array.isArray(walletParam) ? walletParam[0] : walletParam;
 
   try {
     const history = await getWalletHistory(wallet);
     return res.json({ wallet, history, count: history.length });
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ error: message });
   }
 });
 

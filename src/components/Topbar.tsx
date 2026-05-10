@@ -35,7 +35,9 @@ export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
       </form>
 
       <button
-        onClick={() => toast.message("3 new alerts", { description: "Suspicious program interaction detected" })}
+        onClick={() =>
+          toast.message("3 new alerts", { description: "Suspicious program interaction detected" })
+        }
         className="relative w-10 h-10 grid place-items-center rounded-lg border border-border bg-card hover:bg-accent transition"
         aria-label="Notifications"
       >

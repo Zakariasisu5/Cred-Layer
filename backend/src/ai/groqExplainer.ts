@@ -1,6 +1,6 @@
-import Groq from 'groq-sdk';
-import { WalletSignals } from '../blockchain/solanaFetcher';
-import { ScoreResult } from '../services/scoringService';
+import Groq from "groq-sdk";
+import { WalletSignals } from "../blockchain/solanaFetcher";
+import { ScoreResult } from "../services/scoringService";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -8,7 +8,7 @@ const groq = new Groq({
 
 export async function generateExplanation(
   signals: WalletSignals,
-  scoreResult: ScoreResult
+  scoreResult: ScoreResult,
 ): Promise<string> {
   const prompt = `You are CredLayer, a decentralized reputation system for Solana wallets.
 
@@ -23,7 +23,7 @@ WALLET DATA:
 - Unique counterparties: ${signals.uniqueCounterparties}
 - Total volume: ${signals.totalVolumeSOL} SOL
 - Suspicious activity detected: ${signals.suspiciousActivity}
-- Suspicious signals: ${signals.suspiciousReasons.length > 0 ? signals.suspiciousReasons.join(', ') : 'None'}
+- Suspicious signals: ${signals.suspiciousReasons.length > 0 ? signals.suspiciousReasons.join(", ") : "None"}
 - First transaction: ${signals.firstTransactionDate}
 - Last transaction: ${signals.lastTransactionDate}
 
@@ -33,11 +33,11 @@ Breakdown: Wallet Age ${scoreResult.breakdown.walletAge}/20 | Activity ${scoreRe
 Write the trust report now:`;
 
   const response = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [{ role: 'user', content: prompt }],
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: prompt }],
     max_tokens: 200,
     temperature: 0.4,
   });
 
-  return response.choices[0]?.message?.content?.trim() ?? 'Unable to generate explanation.';
+  return response.choices[0]?.message?.content?.trim() ?? "Unable to generate explanation.";
 }

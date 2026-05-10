@@ -1,6 +1,6 @@
-import { supabase } from '../lib/supabase';
-import { WalletSignals } from '../blockchain/solanaFetcher';
-import { ScoreResult } from './scoringService';
+import { supabase } from "../lib/supabase";
+import { WalletSignals } from "../blockchain/solanaFetcher";
+import { ScoreResult } from "./scoringService";
 
 export interface StoredReputation {
   id: string;
@@ -10,7 +10,7 @@ export interface StoredReputation {
   risk_label: string;
   explanation: string | null;
   signals: WalletSignals;
-  breakdown: ScoreResult['breakdown'];
+  breakdown: ScoreResult["breakdown"];
   created_at: string;
   updated_at: string;
 }
@@ -20,10 +20,10 @@ export async function upsertReputation(
   wallet: string,
   scoreResult: ScoreResult,
   signals: WalletSignals,
-  explanation: string | null
+  explanation: string | null,
 ): Promise<StoredReputation> {
   const { data, error } = await supabase
-    .from('wallet_scores')
+    .from("wallet_scores")
     .upsert(
       {
         wallet_address: wallet,
@@ -35,7 +35,7 @@ export async function upsertReputation(
         breakdown: scoreResult.breakdown,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'wallet_address' }
+      { onConflict: "wallet_address" },
     )
     .select()
     .single();
@@ -47,10 +47,10 @@ export async function upsertReputation(
 // Retrieve a wallet's transaction history
 export async function getWalletHistory(wallet: string): Promise<StoredReputation[]> {
   const { data, error } = await supabase
-    .from('wallet_scores')
-    .select('*')
-    .eq('wallet_address', wallet)
-    .order('updated_at', { ascending: false })
+    .from("wallet_scores")
+    .select("*")
+    .eq("wallet_address", wallet)
+    .order("updated_at", { ascending: false })
     .limit(20);
 
   if (error) throw new Error(`Supabase error: ${error.message}`);
@@ -60,9 +60,9 @@ export async function getWalletHistory(wallet: string): Promise<StoredReputation
 // Retrieve the leaderboard — top 10 wallets by score
 export async function getLeaderboard(): Promise<StoredReputation[]> {
   const { data, error } = await supabase
-    .from('wallet_scores')
-    .select('*')
-    .order('score', { ascending: false })
+    .from("wallet_scores")
+    .select("*")
+    .order("score", { ascending: false })
     .limit(10);
 
   if (error) throw new Error(`Supabase error: ${error.message}`);

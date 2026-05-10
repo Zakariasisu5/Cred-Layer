@@ -53,6 +53,24 @@ export interface Metric {
   value: number;
 }
 
+/** Raw account data as returned by Anchor before parsing */
+interface RawBigInt {
+  toNumber(): number;
+}
+interface RawAccount {
+  wallet: web3.PublicKey;
+  authority: web3.PublicKey;
+  trustScore: number;
+  riskLevel: Record<string, unknown>;
+  confidence: number;
+  lastUpdated: RawBigInt;
+  createdAt: RawBigInt;
+  updateCount: RawBigInt;
+  metrics: Array<{ metricType: Record<string, unknown>; value: number }>;
+  riskFlags: Array<Record<string, unknown>>;
+  activeFlagsCount: number;
+}
+
 export class CredLayerClient {
   program: Program<Credlayer>;
   provider: AnchorProvider;
@@ -68,7 +86,7 @@ export class CredLayerClient {
   getReputationPDA(wallet: web3.PublicKey): [web3.PublicKey, number] {
     return web3.PublicKey.findProgramAddressSync(
       [Buffer.from(REPUTATION_SEED), wallet.toBuffer()],
-      PROGRAM_ID
+      PROGRAM_ID,
     );
   }
 
@@ -79,18 +97,18 @@ export class CredLayerClient {
     wallet: web3.PublicKey,
     initialScore: number,
     authority: web3.PublicKey,
-    payer: web3.PublicKey
+    payer: web3.PublicKey,
   ): Promise<string> {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     const tx = await this.program.methods
-      .initializeReputation(initialScore)
+      .initialize_reputation(initialScore)
       .accounts({
         reputation: reputationPda,
         wallet: wallet,
         authority: authority,
         payer: payer,
-        systemProgram: web3.SystemProgram.programId,
+        system_program: web3.SystemProgram.programId,
       })
       .rpc();
 
@@ -104,14 +122,14 @@ export class CredLayerClient {
     wallet: web3.PublicKey,
     newScore: number,
     riskLevel: RiskLevel,
-    confidence: number
+    confidence: number,
   ): Promise<string> {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     const riskLevelEnum = this.convertRiskLevel(riskLevel);
 
     const tx = await this.program.methods
-      .updateReputation(newScore, riskLevelEnum, confidence)
+      .update_reputation(newScore, riskLevelEnum, confidence)
       .accounts({
         reputation: reputationPda,
         authority: this.provider.wallet.publicKey,
@@ -124,17 +142,13 @@ export class CredLayerClient {
   /**
    * Add a behavioral metric
    */
-  async addMetric(
-    wallet: web3.PublicKey,
-    metricType: MetricType,
-    value: number
-  ): Promise<string> {
+  async addMetric(wallet: web3.PublicKey, metricType: MetricType, value: number): Promise<string> {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     const metricTypeEnum = this.convertMetricType(metricType);
 
     const tx = await this.program.methods
-      .addMetric(metricTypeEnum, value)
+      .add_metric(metricTypeEnum, value)
       .accounts({
         reputation: reputationPda,
         authority: this.provider.wallet.publicKey,
@@ -147,16 +161,13 @@ export class CredLayerClient {
   /**
    * Add a risk flag
    */
-  async addRiskFlag(
-    wallet: web3.PublicKey,
-    flag: RiskFlag
-  ): Promise<string> {
+  async addRiskFlag(wallet: web3.PublicKey, flag: RiskFlag): Promise<string> {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     const flagEnum = this.convertRiskFlag(flag);
 
     const tx = await this.program.methods
-      .addRiskFlag(flagEnum)
+      .add_risk_flag(flagEnum)
       .accounts({
         reputation: reputationPda,
         authority: this.provider.wallet.publicKey,
@@ -169,16 +180,13 @@ export class CredLayerClient {
   /**
    * Remove a risk flag
    */
-  async removeRiskFlag(
-    wallet: web3.PublicKey,
-    flag: RiskFlag
-  ): Promise<string> {
+  async removeRiskFlag(wallet: web3.PublicKey, flag: RiskFlag): Promise<string> {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     const flagEnum = this.convertRiskFlag(flag);
 
     const tx = await this.program.methods
-      .removeRiskFlag(flagEnum)
+      .remove_risk_flag(flagEnum)
       .accounts({
         reputation: reputationPda,
         authority: this.provider.wallet.publicKey,
@@ -195,7 +203,12 @@ export class CredLayerClient {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     try {
-      const account = await this.program.account.reputationAccount.fetch(reputationPda);
+      // Anchor converts PascalCase account names to camelCase at runtime
+      const accountNs = this.program.account as Record<
+        string,
+        { fetch(address: web3.PublicKey): Promise<unknown> }
+      >;
+      const account = (await accountNs["reputationAccount"].fetch(reputationPda)) as RawAccount;
       return this.parseReputationAccount(account);
     } catch (error) {
       // Account doesn't exist
@@ -218,7 +231,7 @@ export class CredLayerClient {
     const [reputationPda] = this.getReputationPDA(wallet);
 
     const tx = await this.program.methods
-      .closeReputation()
+      .close_reputation()
       .accounts({
         reputation: reputationPda,
         authority: this.provider.wallet.publicKey,
@@ -229,8 +242,8 @@ export class CredLayerClient {
   }
 
   // Helper methods for enum conversion
-  private convertRiskLevel(level: RiskLevel): any {
-    const map: Record<RiskLevel, any> = {
+  private convertRiskLevel(level: RiskLevel): Record<string, Record<string, never>> {
+    const map: Record<RiskLevel, Record<string, Record<string, never>>> = {
       [RiskLevel.HighlyTrusted]: { highlyTrusted: {} },
       [RiskLevel.Trusted]: { trusted: {} },
       [RiskLevel.MediumRisk]: { mediumRisk: {} },
@@ -239,8 +252,8 @@ export class CredLayerClient {
     return map[level];
   }
 
-  private convertMetricType(type: MetricType): any {
-    const map: Record<MetricType, any> = {
+  private convertMetricType(type: MetricType): Record<string, Record<string, never>> {
+    const map: Record<MetricType, Record<string, Record<string, never>>> = {
       [MetricType.None]: { none: {} },
       [MetricType.BehavioralStability]: { behavioralStability: {} },
       [MetricType.TransactionDiversity]: { transactionDiversity: {} },
@@ -252,8 +265,8 @@ export class CredLayerClient {
     return map[type];
   }
 
-  private convertRiskFlag(flag: RiskFlag): any {
-    const map: Record<RiskFlag, any> = {
+  private convertRiskFlag(flag: RiskFlag): Record<string, Record<string, never>> {
+    const map: Record<RiskFlag, Record<string, Record<string, never>>> = {
       [RiskFlag.None]: { none: {} },
       [RiskFlag.PotentialSybilCluster]: { potentialSybilCluster: {} },
       [RiskFlag.AbnormalTransactionBurst]: { abnormalTransactionBurst: {} },
@@ -266,7 +279,7 @@ export class CredLayerClient {
     return map[flag];
   }
 
-  private parseReputationAccount(account: any): ReputationData {
+  private parseReputationAccount(account: RawAccount): ReputationData {
     return {
       wallet: account.wallet,
       authority: account.authority,
@@ -276,27 +289,27 @@ export class CredLayerClient {
       lastUpdated: account.lastUpdated.toNumber(),
       createdAt: account.createdAt.toNumber(),
       updateCount: account.updateCount.toNumber(),
-      metrics: account.metrics.map((m: any) => this.parseMetric(m)),
-      riskFlags: account.riskFlags.map((f: any) => this.parseRiskFlag(f)),
+      metrics: account.metrics.map((m) => this.parseMetric(m)),
+      riskFlags: account.riskFlags.map((f) => this.parseRiskFlag(f)),
       activeFlagsCount: account.activeFlagsCount,
     };
   }
 
-  private parseRiskLevel(level: any): RiskLevel {
+  private parseRiskLevel(level: Record<string, unknown>): RiskLevel {
     if (level.highlyTrusted) return RiskLevel.HighlyTrusted;
     if (level.trusted) return RiskLevel.Trusted;
     if (level.mediumRisk) return RiskLevel.MediumRisk;
     return RiskLevel.HighRisk;
   }
 
-  private parseMetric(metric: any): Metric {
+  private parseMetric(metric: { metricType: Record<string, unknown>; value: number }): Metric {
     return {
       metricType: this.parseMetricType(metric.metricType),
       value: metric.value,
     };
   }
 
-  private parseMetricType(type: any): MetricType {
+  private parseMetricType(type: Record<string, unknown>): MetricType {
     if (type.behavioralStability) return MetricType.BehavioralStability;
     if (type.transactionDiversity) return MetricType.TransactionDiversity;
     if (type.counterpartyQuality) return MetricType.CounterpartyQuality;
@@ -306,7 +319,7 @@ export class CredLayerClient {
     return MetricType.None;
   }
 
-  private parseRiskFlag(flag: any): RiskFlag {
+  private parseRiskFlag(flag: Record<string, unknown>): RiskFlag {
     if (flag.potentialSybilCluster) return RiskFlag.PotentialSybilCluster;
     if (flag.abnormalTransactionBurst) return RiskFlag.AbnormalTransactionBurst;
     if (flag.unverifiedProgramInteraction) return RiskFlag.UnverifiedProgramInteraction;

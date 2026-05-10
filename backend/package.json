@@ -20,7 +20,8 @@
     "express": "^5.2.1",
     "groq-sdk": "^1.1.2",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "x402": "^1.2.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

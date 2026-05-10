@@ -102,12 +102,18 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body { background-color: var(--color-background); color: var(--color-foreground); }
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
   body {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, oklch(0.86 0.17 92 / 0.10), transparent),
+      radial-gradient(ellipse 80% 50% at 50% -10%, oklch(0.86 0.17 92 / 0.1), transparent),
       radial-gradient(ellipse 60% 40% at 100% 100%, oklch(0.78 0.18 75 / 0.06), transparent);
     background-attachment: fixed;
   }
@@ -117,12 +123,24 @@
   background: var(--gradient-primary);
   color: var(--primary-foreground);
   box-shadow: 0 6px 20px -8px oklch(0.86 0.17 92 / 0.55);
-  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 }
 @utility btn-primary-hover {
-  &:hover { filter: brightness(1.06); box-shadow: 0 10px 28px -8px oklch(0.86 0.17 92 / 0.7); }
-  &:active { transform: translateY(1px) scale(0.99); }
-  &:disabled { opacity: 0.55; cursor: not-allowed; filter: grayscale(0.3); }
+  &:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 10px 28px -8px oklch(0.86 0.17 92 / 0.7);
+  }
+  &:active {
+    transform: translateY(1px) scale(0.99);
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.3);
+  }
 }
 
 @utility text-gradient {

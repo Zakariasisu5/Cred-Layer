@@ -47,36 +47,43 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, []);
 
-  const connect = useCallback(async (name: WalletName) => {
-    if (connecting) return;
-    if (connected) {
-      toast.info("Wallet already connected");
-      return;
-    }
-    setConnecting(true);
-    try {
-      // Simulated wallet handshake (Phantom/Solflare/Backpack)
-      await new Promise((r) => setTimeout(r, 700));
-      const addr = fakeAddress(name + Date.now());
-      setAddress(addr);
-      setWalletName(name);
-      setConnected(true);
+  const connect = useCallback(
+    async (name: WalletName) => {
+      if (connecting) return;
+      if (connected) {
+        toast.info("Wallet already connected");
+        return;
+      }
+      setConnecting(true);
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ address: addr, walletName: name }));
-      } catch {}
-      toast.success(`${name} connected`, { description: addr.slice(0, 6) + "…" + addr.slice(-4) });
-    } catch (e: any) {
-      toast.error("Failed to connect", { description: e?.message ?? "Unknown error" });
-    } finally {
-      setConnecting(false);
-    }
-  }, [connecting, connected]);
+        // Simulated wallet handshake (Phantom/Solflare/Backpack)
+        await new Promise((r) => setTimeout(r, 700));
+        const addr = fakeAddress(name + Date.now());
+        setAddress(addr);
+        setWalletName(name);
+        setConnected(true);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ address: addr, walletName: name }));
+        } catch {}
+        toast.success(`${name} connected`, {
+          description: addr.slice(0, 6) + "…" + addr.slice(-4),
+        });
+      } catch (e: any) {
+        toast.error("Failed to connect", { description: e?.message ?? "Unknown error" });
+      } finally {
+        setConnecting(false);
+      }
+    },
+    [connecting, connected],
+  );
 
   const disconnect = useCallback(async () => {
     setConnected(false);
     setAddress(null);
     setWalletName(null);
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
     toast.success("Wallet disconnected");
   }, []);
 

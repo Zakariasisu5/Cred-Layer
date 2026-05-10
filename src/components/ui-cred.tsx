@@ -4,7 +4,15 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
   return <div className={`glow-card rounded-xl ${className}`}>{children}</div>;
 }
 
-export function CardHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
+export function CardHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex items-start justify-between p-5 pb-3 gap-3">
       <div className="min-w-0">
@@ -16,7 +24,13 @@ export function CardHeader({ title, subtitle, action }: { title: string; subtitl
   );
 }
 
-export function Badge({ children, variant = "default" }: { children: ReactNode; variant?: "default" | "success" | "warning" | "danger" | "primary" }) {
+export function Badge({
+  children,
+  variant = "default",
+}: {
+  children: ReactNode;
+  variant?: "default" | "success" | "warning" | "danger" | "primary";
+}) {
   const styles: Record<string, string> = {
     default: "bg-muted text-muted-foreground border-border",
     success: "bg-success/15 text-success border-success/30",
@@ -25,20 +39,34 @@ export function Badge({ children, variant = "default" }: { children: ReactNode; 
     primary: "bg-primary/15 text-primary border-primary/30",
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border ${styles[variant]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border ${styles[variant]}`}
+    >
       {children}
     </span>
   );
 }
 
-export function Stat({ label, value, delta, deltaType = "up" }: { label: string; value: string; delta?: string; deltaType?: "up" | "down" }) {
+export function Stat({
+  label,
+  value,
+  delta,
+  deltaType = "up",
+}: {
+  label: string;
+  value: string;
+  delta?: string;
+  deltaType?: "up" | "down";
+}) {
   return (
     <div className="p-5">
       <div className="text-xs text-muted-foreground uppercase tracking-wider">{label}</div>
       <div className="mt-2 flex items-baseline gap-2">
         <div className="text-2xl font-semibold tracking-tight">{value}</div>
         {delta && (
-          <span className={`text-xs font-medium ${deltaType === "up" ? "text-success" : "text-danger"}`}>
+          <span
+            className={`text-xs font-medium ${deltaType === "up" ? "text-success" : "text-danger"}`}
+          >
             {deltaType === "up" ? "▲" : "▼"} {delta}
           </span>
         )}
@@ -54,7 +82,10 @@ interface CredButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 export const CredButton = forwardRef<HTMLButtonElement, CredButtonProps>(
-  ({ variant = "primary", size = "md", loading, className = "", disabled, children, ...rest }, ref) => {
+  (
+    { variant = "primary", size = "md", loading, className = "", disabled, children, ...rest },
+    ref,
+  ) => {
     const sizes = { sm: "h-8 px-3 text-xs", md: "h-10 px-4 text-sm", lg: "h-11 px-5 text-sm" };
     const variants: Record<Variant, string> = {
       primary: "btn-primary btn-primary-hover font-medium",
@@ -74,6 +105,6 @@ export const CredButton = forwardRef<HTMLButtonElement, CredButtonProps>(
         {children}
       </button>
     );
-  }
+  },
 );
 CredButton.displayName = "CredButton";

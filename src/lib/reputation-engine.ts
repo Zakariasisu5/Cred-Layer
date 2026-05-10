@@ -104,10 +104,7 @@ export function scoreWallet(wallet: string, f: WalletFeatures): ReputationResult
     counterpartyScore * 0.16;
 
   const risk =
-    burstPenalty * 0.25 +
-    sybilPenalty * 0.3 +
-    unverifiedPenalty * 0.2 +
-    failPenalty * 0.25;
+    burstPenalty * 0.25 + sybilPenalty * 0.3 + unverifiedPenalty * 0.2 + failPenalty * 0.25;
 
   const trust = Math.round(clamp(positive - risk * 0.45));
 
@@ -131,16 +128,22 @@ export function scoreWallet(wallet: string, f: WalletFeatures): ReputationResult
   if (successScore > 95) insights.push("Consistent transaction success rate.");
   if (diversityScore > 70) insights.push("Healthy protocol diversity across the Solana ecosystem.");
   if (ageScore > 70) insights.push("Mature wallet with long-standing on-chain history.");
-  if (flags.includes("potential_sybil_cluster")) insights.push("Counterparty graph overlaps with newly-created wallets — possible Sybil exposure.");
-  if (flags.includes("abnormal_transaction_burst")) insights.push("Detected unusual transaction frequency spikes.");
-  if (flags.includes("low_protocol_diversity")) insights.push("Limited DeFi protocol diversity — narrow behavioral surface.");
-  if (insights.length === 0) insights.push("Behavior is within normal Solana retail-user distribution.");
+  if (flags.includes("potential_sybil_cluster"))
+    insights.push(
+      "Counterparty graph overlaps with newly-created wallets — possible Sybil exposure.",
+    );
+  if (flags.includes("abnormal_transaction_burst"))
+    insights.push("Detected unusual transaction frequency spikes.");
+  if (flags.includes("low_protocol_diversity"))
+    insights.push("Limited DeFi protocol diversity — narrow behavioral surface.");
+  if (insights.length === 0)
+    insights.push("Behavior is within normal Solana retail-user distribution.");
 
   // Confidence: more activity & age => more reliable signal
   const confidence = +clamp(
     0.55 + (ageScore + activityScore + counterpartyScore) / 600,
     0,
-    99
+    99,
   ).toFixed(2);
   const confidenceNorm = Math.min(0.99, +(confidence / 1).toFixed(2));
 

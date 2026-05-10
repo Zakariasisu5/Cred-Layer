@@ -3,18 +3,18 @@ import {
   PublicKey,
   ParsedTransactionWithMeta,
   LAMPORTS_PER_SOL,
-} from '@solana/web3.js';
-import dotenv from 'dotenv';
+} from "@solana/web3.js";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 // Connecting to the Solana network (devnet for testing, mainnet-beta for production)
 const connection = new Connection(
-  process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
-  'confirmed'
+  process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com",
+  "confirmed",
 );
 
-// Types 
+// Types
 export interface WalletSignals {
   walletAddress: string;
   walletAgeMonths: number;
@@ -28,17 +28,17 @@ export interface WalletSignals {
   lastTransactionDate: string | null;
 }
 
-// Known DeFi Protocols on Solana 
+// Known DeFi Protocols on Solana
 // Detects if the wallet has interacted with legitimate protocols
 const KNOWN_DEFI_PROGRAMS = new Set([
-  'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4', // Jupiter
-  '9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP', // Orca
-  '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8', // Raydium
-  'So11111111111111111111111111111111111111112',    // Wrapped SOL
-  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+  "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", // Jupiter
+  "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP", // Orca
+  "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8", // Raydium
+  "So11111111111111111111111111111111111111112", // Wrapped SOL
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
 ]);
 
-// Main function to fetch wallet signals 
+// Main function to fetch wallet signals
 
 export async function fetchWalletSignals(walletAddress: string): Promise<WalletSignals> {
   // 1. Validate the Solana wallet address
@@ -71,12 +71,17 @@ export async function fetchWalletSignals(walletAddress: string): Promise<WalletS
   const txDetails = await fetchTransactionDetails(signatures.slice(0, 20));
 
   // 5. Analyze the signals from transactions
-  const { defiInteractions, totalVolumeSOL, uniqueCounterparties } =
-    analyzeTransactions(txDetails, walletAddress);
+  const { defiInteractions, totalVolumeSOL, uniqueCounterparties } = analyzeTransactions(
+    txDetails,
+    walletAddress,
+  );
 
   // 6. Detect suspicious behavior based on patterns in transactions
-  const { suspiciousActivity, suspiciousReasons } =
-    detectSuspiciousBehavior(signatures, txDetails, walletAgeMonths);
+  const { suspiciousActivity, suspiciousReasons } = detectSuspiciousBehavior(
+    signatures,
+    txDetails,
+    walletAgeMonths,
+  );
 
   return {
     walletAddress,
@@ -95,19 +100,20 @@ export async function fetchWalletSignals(walletAddress: string): Promise<WalletS
 // Retrieves transaction details in batches to avoid rate limits and improve performance
 
 async function fetchTransactionDetails(
-  signatures: Awaited<ReturnType<Connection['getSignaturesForAddress']>>
+  signatures: Awaited<ReturnType<Connection["getSignaturesForAddress"]>>,
 ): Promise<ParsedTransactionWithMeta[]> {
   const txPromises = signatures.map((sig) =>
     connection.getParsedTransaction(sig.signature, {
       maxSupportedTransactionVersion: 0,
-    })
+    }),
   );
 
   const results = await Promise.allSettled(txPromises);
 
   return results
-    .filter((r): r is PromiseFulfilledResult<ParsedTransactionWithMeta> =>
-      r.status === 'fulfilled' && r.value !== null
+    .filter(
+      (r): r is PromiseFulfilledResult<ParsedTransactionWithMeta> =>
+        r.status === "fulfilled" && r.value !== null,
     )
     .map((r) => r.value);
 }
@@ -116,7 +122,7 @@ async function fetchTransactionDetails(
 
 function analyzeTransactions(
   txDetails: ParsedTransactionWithMeta[],
-  walletAddress: string
+  walletAddress: string,
 ): { defiInteractions: number; totalVolumeSOL: number; uniqueCounterparties: number } {
   let defiInteractions = 0;
   let totalVolumeSOL = 0;
@@ -125,9 +131,7 @@ function analyzeTransactions(
   for (const tx of txDetails) {
     if (!tx?.meta || !tx.transaction) continue;
 
-    const accountKeys = tx.transaction.message.accountKeys.map((k) =>
-      k.pubkey.toString()
-    );
+    const accountKeys = tx.transaction.message.accountKeys.map((k) => k.pubkey.toString());
 
     // Detects DeFi interactions
     for (const key of accountKeys) {
@@ -146,8 +150,7 @@ function analyzeTransactions(
       const walletIndex = accountKeys.indexOf(walletAddress);
       if (walletIndex !== -1) {
         const balanceDiff = Math.abs(
-          (tx.meta.preBalances[walletIndex] - tx.meta.postBalances[walletIndex]) /
-            LAMPORTS_PER_SOL
+          (tx.meta.preBalances[walletIndex] - tx.meta.postBalances[walletIndex]) / LAMPORTS_PER_SOL,
         );
         totalVolumeSOL += balanceDiff;
       }
@@ -164,15 +167,15 @@ function analyzeTransactions(
 // Detect suspicious behavior based on patterns in transactions
 
 function detectSuspiciousBehavior(
-  signatures: Awaited<ReturnType<Connection['getSignaturesForAddress']>>,
+  signatures: Awaited<ReturnType<Connection["getSignaturesForAddress"]>>,
   txDetails: ParsedTransactionWithMeta[],
-  walletAgeMonths: number
+  walletAgeMonths: number,
 ): { suspiciousActivity: boolean; suspiciousReasons: string[] } {
   const reasons: string[] = [];
 
   // Signal 1 : New wallet with unusually high transaction volume (bot pattern)
   if (walletAgeMonths < 1 && signatures.length > 20) {
-    reasons.push('New wallet with unusually high transaction volume');
+    reasons.push("New wallet with unusually high transaction volume");
   }
 
   // Signal 2 : High number of failed transactions (spam or attack pattern)
@@ -201,7 +204,7 @@ function detectSuspiciousBehavior(
   // Signal 4 : Recent transaction errors
   const recentErrors = signatures.slice(0, 5).filter((s) => s.err !== null).length;
   if (recentErrors >= 3) {
-    reasons.push('Multiple recent transaction errors');
+    reasons.push("Multiple recent transaction errors");
   }
 
   return {
@@ -219,7 +222,7 @@ function buildEmptySignals(walletAddress: string): WalletSignals {
     transactionCount: 0,
     defiInteractions: 0,
     suspiciousActivity: false,
-    suspiciousReasons: ['No transaction history found'],
+    suspiciousReasons: ["No transaction history found"],
     totalVolumeSOL: 0,
     uniqueCounterparties: 0,
     firstTransactionDate: null,

@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express';
-import { getLeaderboard } from '../services/reputationStorage';
+import { Router, Request, Response } from "express";
+import { getLeaderboard } from "../services/reputationStorage";
 
 const router = Router();
 
-router.get('/', async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   try {
     const leaderboard = await getLeaderboard();
 
@@ -17,9 +17,9 @@ router.get('/', async (req: Request, res: Response) => {
       })),
       total: leaderboard.length,
     });
-
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ error: message });
   }
 });
 

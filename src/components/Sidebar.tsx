@@ -19,10 +19,16 @@ function Inner({ onNavigate }: { onNavigate?: () => void }) {
         <img src={logo} alt="CredLayer" className="w-9 h-9 rounded-lg" />
         <div className="flex-1">
           <div className="text-base font-semibold tracking-tight text-gradient">CredLayer</div>
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Trust Protocol</div>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Trust Protocol
+          </div>
         </div>
         {onNavigate && (
-          <button onClick={onNavigate} className="md:hidden w-8 h-8 grid place-items-center rounded-md hover:bg-accent" aria-label="Close">
+          <button
+            onClick={onNavigate}
+            className="md:hidden w-8 h-8 grid place-items-center rounded-md hover:bg-accent"
+            aria-label="Close"
+          >
             <X className="w-4 h-4" />
           </button>
         )}
@@ -43,7 +49,9 @@ function Inner({ onNavigate }: { onNavigate?: () => void }) {
             >
               <it.icon className={`w-4 h-4 ${active ? "text-primary" : ""}`} />
               <span>{it.title}</span>
-              {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />}
+              {active && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
+              )}
             </Link>
           );
         })}
