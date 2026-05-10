@@ -36,25 +36,11 @@ export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
-const trend = Array.from({ length: 24 }, (_, i) => ({
-  t: `${i}:00`,
-  score: 60 + Math.round(Math.sin(i / 3) * 8 + i * 0.8 + Math.random() * 4),
-  ai: 70 + Math.round(Math.cos(i / 4) * 6 + i * 0.6),
-}));
+const trend: any[] = [];
 
-const activity = [
-  { type: "Swap", from: "Jupiter", amount: "12.4 SOL", risk: "low", time: "2m ago" },
-  { type: "Mint", from: "Magic Eden", amount: "1 NFT", risk: "low", time: "8m ago" },
-  { type: "Transfer", from: "Unknown wallet", amount: "320 USDC", risk: "med", time: "21m ago" },
-  { type: "Contract call", from: "Unverified program", amount: "—", risk: "high", time: "1h ago" },
-  { type: "Stake", from: "Marinade", amount: "50 SOL", risk: "low", time: "3h ago" },
-];
+const activity: any[] = [];
 
-const interactions = Array.from({ length: 7 }, (_, i) => ({
-  d: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i],
-  defi: 20 + Math.round(Math.random() * 50),
-  nft: 5 + Math.round(Math.random() * 25),
-}));
+const interactions: any[] = [];
 
 function Dashboard() {
   const { connected, address } = useWallet();

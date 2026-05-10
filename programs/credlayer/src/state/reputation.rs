@@ -62,7 +62,7 @@ impl ReputationAccount {
 }
 
 /// Risk level classification
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum RiskLevel {
     HighlyTrusted,  // 81-100
     Trusted,        // 61-80
@@ -88,7 +88,7 @@ impl Metric {
 }
 
 /// Types of behavioral metrics
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum MetricType {
     None,
     BehavioralStability,
@@ -106,7 +106,7 @@ impl Default for MetricType {
 }
 
 /// Risk flags for suspicious activity
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum RiskFlag {
     None,
     PotentialSybilCluster,

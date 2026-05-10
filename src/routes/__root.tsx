@@ -32,7 +32,7 @@ function ErrorView({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -64,8 +64,15 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 function Root() {
-  const { queryClient } = Route.useRouteContext();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+        retry: 1,
+      },
+    },
+  }));
   const path = useRouterState({ select: (s) => s.location.pathname });
   const isLanding = path === "/";
   return (

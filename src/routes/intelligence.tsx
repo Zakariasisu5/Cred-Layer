@@ -13,14 +13,9 @@ export const Route = createFileRoute("/intelligence")({
   component: Intel,
 });
 
-const radar = [
-  { k: "Sybil", a: 22 }, { k: "Wash", a: 14 }, { k: "Drainer", a: 8 },
-  { k: "Bot", a: 35 }, { k: "Mixer", a: 18 }, { k: "Phish", a: 11 },
-];
+const radar: any[] = [];
 
-const pred = Array.from({ length: 14 }, (_, i) => ({
-  d: `D${i+1}`, risk: 18 + Math.round(Math.sin(i / 2) * 8 + Math.random() * 5),
-}));
+const pred: any[] = [];
 
 function Intel() {
   return (

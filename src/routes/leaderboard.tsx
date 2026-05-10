@@ -12,13 +12,7 @@ export const Route = createFileRoute("/leaderboard")({
   component: LB,
 });
 
-const top = Array.from({ length: 10 }, (_, i) => ({
-  rank: i + 1,
-  addr: `${["7xKX","9pNm","Bv4j","Cz8L","Dk3w","Ev7q","Fh2r","Gi5s","Hj9t","Kx1u"][i]}…${["aP9q","b3Lk","mP2x","nQ4y","oR5z","pS6a","qT7b","rU8c","sV9d","tW0e"][i]}`,
-  score: 99 - i,
-  growth: `+${(12 - i * 0.7).toFixed(1)}%`,
-  tag: i < 3 ? "Elite" : i < 6 ? "Trusted" : "Active",
-}));
+const top: any[] = [];
 
 function LB() {
   return (
