@@ -29,8 +29,9 @@ router.get("/:wallet", async (req: Request, res: Response) => {
               : "low",
       },
     });
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ error: message });
   }
 });
 

@@ -1,26 +1,10 @@
+import { useEffect, useState } from "react";
+import { fetchReputation, type WalletReputation } from "@/lib/api";
+
 import { Navigate, createFileRoute } from "@tanstack/react-router";
-import {
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  BarChart,
-  Bar,
-} from "recharts";
 import { Card, CardHeader, Badge, Stat } from "@/components/ui-cred";
 import { TrustScoreRing } from "@/components/TrustScoreRing";
-import {
-  Activity,
-  AlertTriangle,
-  ArrowUpRight,
-  Cpu,
-  ShieldCheck,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { Activity, ShieldCheck, Sparkles } from "lucide-react";
 import { useWallet, shortAddress } from "@/lib/wallet";
 
 export const Route = createFileRoute("/dashboard")({
@@ -36,19 +20,24 @@ export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
-const trend: any[] = [];
-
-const activity: any[] = [];
-
-const interactions: any[] = [];
-
 function Dashboard() {
   const { connected, address } = useWallet();
+  const [reputation, setReputation] = useState<WalletReputation | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Redirect to home if wallet is not connected
-  if (!connected) {
-    return <Navigate to="/" />;
-  }
+  useEffect(() => {
+    if (!connected || !address) return;
+    setLoading(true);
+    fetchReputation(address)
+      .then(setReputation)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [connected, address]);
+
+  if (!connected) return <Navigate to="/" />;
+
+  const score = reputation?.score ?? 0;
+  const signals = reputation?.signals;
 
   return (
     <div className="space-y-6">
@@ -56,10 +45,8 @@ function Dashboard() {
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Wallet Intelligence</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            <span className="font-mono">
-              {connected && address ? shortAddress(address) : "Not connected"}
-            </span>{" "}
-            · Solana Mainnet
+            <span className="font-mono">{address ? shortAddress(address) : "Not connected"}</span> ·
+            Solana Mainnet
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -67,222 +54,112 @@ function Dashboard() {
             <ShieldCheck className="w-3 h-3" /> Verified
           </Badge>
           <Badge variant="primary">
-            <Sparkles className="w-3 h-3" /> AI Confidence 94%
+            <Sparkles className="w-3 h-3" /> Live Score
           </Badge>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <Card className="lg:col-span-1 p-6 flex flex-col items-center justify-center">
-          <TrustScoreRing score={87} />
+          {loading ? (
+            <div className="w-[200px] h-[200px] rounded-full border-2 border-dashed border-border animate-pulse" />
+          ) : (
+            <TrustScoreRing score={score} />
+          )}
           <div className="mt-5 text-center">
-            <Badge variant="success">Low Risk · Trusted</Badge>
+            <Badge
+              variant={
+                score >= 81
+                  ? "success"
+                  : score >= 61
+                    ? "primary"
+                    : score >= 31
+                      ? "warning"
+                      : "danger"
+              }
+            >
+              {reputation?.riskLabel ?? "Analyzing..."}
+            </Badge>
             <p className="text-xs text-muted-foreground mt-3 max-w-xs">
-              Score derived from 1.2K on-chain signals, behavioral history, and AI pattern analysis.
+              {reputation?.explanation ?? "Connect your wallet to see your trust score."}
             </p>
           </div>
         </Card>
 
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Reputation Trend"
-            subtitle="Last 24 hours · Trust score vs AI confidence"
+            title="Score Breakdown"
+            subtitle="5 criteria composing your trust score"
             action={
               <Badge variant="primary">
                 <Activity className="w-3 h-3" /> Live
               </Badge>
             }
           />
-          <div className="h-64 px-2 pb-3">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trend}>
-                <defs>
-                  <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.55} />
-                    <stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="var(--color-border)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="t"
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--color-popover)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="score"
-                  stroke="var(--color-primary)"
-                  strokeWidth={2}
-                  fill="url(#g1)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="p-5 space-y-4">
+            {reputation ? (
+              Object.entries(reputation.breakdown).map(([key, value]) => {
+                const labels: Record<string, string> = {
+                  walletAge: "Wallet Age",
+                  activity: "Transaction Activity",
+                  defi: "DeFi Experience",
+                  behavior: "Clean Behavior",
+                  network: "Network Reach",
+                };
+                return (
+                  <div key={key}>
+                    <div className="flex items-center justify-between text-sm">
+                      <span>{labels[key] ?? key}</span>
+                      <span className="font-mono text-muted-foreground">{value}/20</span>
+                    </div>
+                    <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all"
+                        style={{ width: `${(value / 20) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-sm text-muted-foreground">Analyzing your wallet...</p>
+            )}
           </div>
         </Card>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         <Card>
-          <Stat label="Wallet Age" value="2.4 yrs" delta="Tier 3" />
+          <Stat label="Wallet Age" value={signals ? `${signals.walletAgeMonths}mo` : "—"} />
         </Card>
         <Card>
-          <Stat label="Total Value" value="$48.2K" delta="3.2%" deltaType="up" />
+          <Stat label="Total Volume" value={signals ? `${signals.totalVolumeSOL} SOL` : "—"} />
         </Card>
         <Card>
-          <Stat label="Tx Count (30d)" value="412" delta="12%" deltaType="up" />
+          <Stat label="Tx Count" value={signals ? signals.transactionCount.toString() : "—"} />
         </Card>
         <Card>
-          <Stat label="Risk Flags" value="0" delta="Clean" deltaType="up" />
+          <Stat
+            label="Risk Flags"
+            value={signals?.suspiciousActivity ? "Yes" : "Clean"}
+            deltaType={signals?.suspiciousActivity ? "down" : "up"}
+          />
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="Recent Blockchain Activity"
-            subtitle="Latest transactions and contract interactions"
-          />
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground border-y border-border">
-                  <th className="px-5 py-3 font-medium">Type</th>
-                  <th className="px-5 py-3 font-medium">Counterparty</th>
-                  <th className="px-5 py-3 font-medium">Amount</th>
-                  <th className="px-5 py-3 font-medium">Risk</th>
-                  <th className="px-5 py-3 font-medium">Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activity.map((a, i) => (
-                  <tr key={i} className="border-b border-border/50 hover:bg-accent/30 transition">
-                    <td className="px-5 py-3 font-medium">{a.type}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{a.from}</td>
-                    <td className="px-5 py-3 font-mono">{a.amount}</td>
-                    <td className="px-5 py-3">
-                      <Badge
-                        variant={
-                          a.risk === "low" ? "success" : a.risk === "med" ? "warning" : "danger"
-                        }
-                      >
-                        {a.risk.toUpperCase()}
-                      </Badge>
-                    </td>
-                    <td className="px-5 py-3 text-muted-foreground text-xs">{a.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-
+      {reputation?.explanation && (
         <Card>
           <CardHeader
-            title="Suspicious Activity"
-            subtitle="AI-detected anomalies"
-            action={
-              <Badge variant="danger">
-                <AlertTriangle className="w-3 h-3" /> 2 New
-              </Badge>
-            }
+            title="AI Trust Insights"
+            subtitle="Generated by CredLayer Reputation Engine"
           />
-          <div className="px-5 pb-5 space-y-3">
-            {[
-              {
-                t: "Unverified program interaction",
-                d: "Program ID: 4nT…vqz",
-                v: "warning" as const,
-                icon: AlertTriangle,
-              },
-              {
-                t: "Unusual outbound transfer pattern",
-                d: "3 wallets, 5 minutes apart",
-                v: "danger" as const,
-                icon: Zap,
-              },
-              {
-                t: "AI flagged Sybil cluster proximity",
-                d: "Confidence 71%",
-                v: "warning" as const,
-                icon: Cpu,
-              },
-            ].map((x, i) => (
-              <div
-                key={i}
-                className="p-3 rounded-lg border border-border bg-elevated/50 flex gap-3"
-              >
-                <div
-                  className={`w-8 h-8 rounded-md grid place-items-center bg-${x.v === "danger" ? "danger" : "warning"}/15`}
-                >
-                  <x.icon
-                    className={`w-4 h-4 ${x.v === "danger" ? "text-danger" : "text-warning"}`}
-                  />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-sm font-medium">{x.t}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{x.d}</div>
-                </div>
-                <ArrowUpRight className="w-4 h-4 text-muted-foreground ml-auto" />
-              </div>
-            ))}
+          <div className="p-5 pt-0">
+            <div className="p-4 rounded-lg border border-primary/30 bg-primary/5">
+              <p className="text-sm text-foreground/90 leading-relaxed">{reputation.explanation}</p>
+            </div>
           </div>
         </Card>
-      </div>
-
-      <Card>
-        <CardHeader title="Wallet Analytics" subtitle="DeFi & NFT interactions · last 7 days" />
-        <div className="h-64 px-2 pb-3">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={interactions}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-              <XAxis
-                dataKey="d"
-                tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--color-popover)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: 8,
-                  fontSize: 12,
-                }}
-              />
-              <Bar dataKey="defi" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
-              <Bar
-                dataKey="nft"
-                fill="var(--color-primary)"
-                fillOpacity={0.45}
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
+      )}
     </div>
   );
 }
