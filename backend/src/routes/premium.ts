@@ -3,6 +3,7 @@ import { fetchWalletSignals } from "../blockchain/solanaFetcher";
 import { calculateScore } from "../services/scoringService";
 import { generateExplanation } from "../ai/claudeExplainer";
 import { upsertReputation } from "../services/reputationStorage";
+import { isValidSolanaWalletAddress } from "../lib/walletValidation";
 
 const router = Router();
 
@@ -16,7 +17,9 @@ router.get("/reputation/:wallet", async (req: Request, res: Response) => {
     wallet = wallet[0];
   }
 
-  if (!wallet || wallet.length < 32 || wallet.length > 44) {
+  wallet = wallet?.trim();
+
+  if (!isValidSolanaWalletAddress(wallet)) {
     return res.status(400).json({ error: "Invalid Solana wallet address" });
   }
 

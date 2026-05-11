@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useWallet, shortAddress } from "@/lib/wallet";
+import { useWallet } from "@/lib/wallet";
+import { shortAddress } from "@/lib/wallet-utils";
 import { Wallet, Loader2, LogOut, Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 

@@ -3,7 +3,7 @@ import { Card, CardHeader, Badge, CredButton } from "@/components/ui-cred";
 import { TrustScoreRing } from "@/components/TrustScoreRing";
 import { Search, Sparkles, ShieldAlert, Network, FileCode, AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { isValidSolanaAddress } from "@/lib/wallet";
+import { isValidSolanaAddress } from "@/lib/wallet-utils";
 import { toast } from "sonner";
 import type { ReputationResult } from "@/lib/reputation-engine";
 import { fetchReputation } from "@/lib/api";

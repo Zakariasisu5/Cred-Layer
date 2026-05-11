@@ -1,7 +1,6 @@
-import { supabase } from "../lib/supabase";
+import { getSupabase, isSupabaseConfigured } from "../lib/supabase";
 import { WalletSignals } from "../blockchain/solanaFetcher";
 import { ScoreResult } from "./scoringService";
-
 export interface StoredReputation {
   id: string;
   wallet_address: string;
@@ -22,7 +21,23 @@ export async function upsertReputation(
   signals: WalletSignals,
   explanation: string | null,
 ): Promise<StoredReputation> {
-  const { data, error } = await supabase
+  if (!isSupabaseConfigured()) {
+    const now = new Date().toISOString();
+    return {
+      id: `local-${wallet}-${Date.now()}`,
+      wallet_address: wallet,
+      score: scoreResult.score,
+      risk: scoreResult.risk,
+      risk_label: scoreResult.riskLabel,
+      explanation,
+      signals,
+      breakdown: scoreResult.breakdown,
+      created_at: now,
+      updated_at: now,
+    };
+  }
+
+  const { data, error } = await getSupabase()
     .from("wallet_scores")
     .upsert(
       {
@@ -46,7 +61,11 @@ export async function upsertReputation(
 
 // Retrieve a wallet's transaction history
 export async function getWalletHistory(wallet: string): Promise<StoredReputation[]> {
-  const { data, error } = await supabase
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const { data, error } = await getSupabase()
     .from("wallet_scores")
     .select("*")
     .eq("wallet_address", wallet)
@@ -59,7 +78,11 @@ export async function getWalletHistory(wallet: string): Promise<StoredReputation
 
 // Retrieve the leaderboard — top 10 wallets by score
 export async function getLeaderboard(): Promise<StoredReputation[]> {
-  const { data, error } = await supabase
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const { data, error } = await getSupabase()
     .from("wallet_scores")
     .select("*")
     .order("score", { ascending: false })

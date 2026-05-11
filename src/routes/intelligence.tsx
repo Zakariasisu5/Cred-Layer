@@ -89,12 +89,14 @@ function Intel() {
         <Card>
           <CardHeader title="Behavioral Class" subtitle="Classifier output" />
           <div className="p-5 pt-0 space-y-3">
-            {[
-              ["Retail User", 76],
-              ["Power Trader", 18],
-              ["Bot / Automated", 4],
-              ["Sybil cluster", 2],
-            ].map(([n, p]: any) => (
+            {(
+              [
+                ["Retail User", 76],
+                ["Power Trader", 18],
+                ["Bot / Automated", 4],
+                ["Sybil cluster", 2],
+              ] as [string, number][]
+            ).map(([n, p]) => (
               <div key={n}>
                 <div className="flex justify-between text-sm">
                   <span>{n}</span>
@@ -163,8 +165,24 @@ function Intel() {
         ].map((x, i) => (
           <Card key={i} className="p-5">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-lg grid place-items-center bg-${x.c}/15`}>
-                <x.i className={`w-5 h-5 text-${x.c}`} />
+              <div
+                className={`w-10 h-10 rounded-lg grid place-items-center ${
+                  x.c === "danger"
+                    ? "bg-danger/15"
+                    : x.c === "warning"
+                      ? "bg-warning/15"
+                      : "bg-primary/15"
+                }`}
+              >
+                <x.i
+                  className={`w-5 h-5 ${
+                    x.c === "danger"
+                      ? "text-danger"
+                      : x.c === "warning"
+                        ? "text-warning"
+                        : "text-primary"
+                  }`}
+                />
               </div>
               <div>
                 <div className="text-xs text-muted-foreground uppercase tracking-wider">{x.t}</div>
@@ -187,16 +205,18 @@ function Intel() {
           }
         />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-5 pt-0">
-          {[
-            ["Wallet Age", "2.4 yrs", "success"],
-            ["Tx Volume", "$2.1M", "success"],
-            ["Unique CPs", "412", "success"],
-            ["Failed Tx", "0.8%", "success"],
-            ["Mixer Use", "None", "success"],
-            ["Drainer Hits", "0", "success"],
-            ["Cluster Density", "Low", "success"],
-            ["Bot Score", "0.04", "success"],
-          ].map(([l, v, c]: any) => (
+          {(
+            [
+              ["Wallet Age", "2.4 yrs", "success"],
+              ["Tx Volume", "$2.1M", "success"],
+              ["Unique CPs", "412", "success"],
+              ["Failed Tx", "0.8%", "success"],
+              ["Mixer Use", "None", "success"],
+              ["Drainer Hits", "0", "success"],
+              ["Cluster Density", "Low", "success"],
+              ["Bot Score", "0.04", "success"],
+            ] as [string, string, string][]
+          ).map(([l, v, c]) => (
             <div key={l} className="p-3 rounded-lg border border-border bg-elevated/40">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
               <div className={`mt-1 text-sm font-semibold text-${c}`}>{v}</div>

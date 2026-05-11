@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardHeader, Badge, CredButton } from "@/components/ui-cred";
 import { Wallet, Bell, Palette, ShieldCheck } from "lucide-react";
 import { useState } from "react";
-import { useWallet, shortAddress } from "@/lib/wallet";
+import { useWallet } from "@/lib/wallet";
+import { shortAddress } from "@/lib/wallet-utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({

@@ -5,7 +5,8 @@ import { Navigate, createFileRoute } from "@tanstack/react-router";
 import { Card, CardHeader, Badge, Stat } from "@/components/ui-cred";
 import { TrustScoreRing } from "@/components/TrustScoreRing";
 import { Activity, ShieldCheck, Sparkles } from "lucide-react";
-import { useWallet, shortAddress } from "@/lib/wallet";
+import { useWallet } from "@/lib/wallet";
+import { shortAddress } from "@/lib/wallet-utils";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
